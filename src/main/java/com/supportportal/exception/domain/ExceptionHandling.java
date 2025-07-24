@@ -1,5 +1,6 @@
 package com.supportportal.exception.domain;
 
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +18,10 @@ import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.Objects;
 import org.slf4j.Logger;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 @RestControllerAdvice
-public class ExceptionHandling {
+public class ExceptionHandling implements ErrorController {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private static final String ACCOUNT_LOCKED = "Your account has been locked. Please contact administeration";
@@ -29,6 +31,7 @@ public class ExceptionHandling {
 	private static final String INCORRECT_CEEDENTIALS = "Username / Password incorrect.Please try again";
 	private static final String ERROR_PROCESSING_FILE = "Error occurred while processing file";
 	private static final String NOT_ENOUGH_PERMISSION = "You do not have enought permission";
+	public static final String ERROR_PATH = "/error";
 	
 	@ExceptionHandler(DisabledException.class)
 	public  ResponseEntity<HttpResponse> accountDisabledException(){
@@ -52,7 +55,7 @@ public class ExceptionHandling {
 	
 	@ExceptionHandler(TokenExpiredException.class)
 	public  ResponseEntity<HttpResponse> tokenExpiredException(TokenExpiredException exception){
-		return createHttpResponse(HttpStatus.UNAUTHORIZED, exception.getMessage().toUpperCase());
+		return createHttpResponse(HttpStatus.UNAUTHORIZED, exception.getMessage());
 	}
 	
 	@ExceptionHandler(EmailExistException.class)
@@ -74,7 +77,12 @@ public class ExceptionHandling {
 	public  ResponseEntity<HttpResponse> userNotFoundException(UserNotFoundException exception){
 		return createHttpResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
 	}
-	
+
+//	@ExceptionHandler(NoHandlerFoundException.class)
+//	public  ResponseEntity<HttpResponse> methodNotSupportedException(NoHandlerFoundException e){
+//		return createHttpResponse(HttpStatus.BAD_REQUEST, "This page was not found");
+//	}
+
 	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
 	public  ResponseEntity<HttpResponse> methodNotSupportedException(HttpRequestMethodNotSupportedException exception){
 		HttpMethod supportedMethod = Objects.requireNonNull(exception.getSupportedHttpMethods()).iterator().next();
@@ -103,5 +111,10 @@ public class ExceptionHandling {
 		return new ResponseEntity<>(new HttpResponse(httpStatus.value(),httpStatus,
 				httpStatus.getReasonPhrase().toUpperCase(),message.toUpperCase()), httpStatus);
 		
+	}
+
+	@Override
+	public String getErrorPath() {
+		return ERROR_PATH;
 	}
 }
