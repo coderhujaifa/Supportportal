@@ -44,7 +44,21 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
             .authorizeHttpRequests()
-            .requestMatchers("/user/register", "/user/login").permitAll() // FIX: change from /api/ to /user/
+            .requestMatchers(
+                "/user/register",
+                "/user/login",
+                "/user/image/**",             
+                "/user/image/profile/**",
+                "/user/add",
+                "/user/update",
+                "/user/find/**",                  
+                "/user/list",                     
+                "/user/resetPassword/**",         
+                "/user/delete/**",                 
+                "/user/updateProfileIamge",        
+                "/user/image*/**"    
+                
+            ).permitAll()
             .anyRequest().authenticated()
             .and()
             .exceptionHandling()
@@ -58,5 +72,6 @@ public class SecurityConfiguration {
 
         return http.build();
     }
+
 
 }

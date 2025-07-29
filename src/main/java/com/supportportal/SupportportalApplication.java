@@ -14,5 +14,4 @@ public class SupportportalApplication {
 		SpringApplication.run(SupportportalApplication.class, args);
 		new File(USER_FOLDER).mkdirs();
 	}
-
 }

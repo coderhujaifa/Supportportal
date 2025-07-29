@@ -1,5 +1,6 @@
 package com.supportportal.service.impl;
 
+import com.supportportal.constant.FileConstant;
 import com.supportportal.domain.User;
 import com.supportportal.domain.UserPrincipal;
 import com.supportportal.enumeration.Role;
@@ -121,11 +122,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
     
     @Override
-	public User addNewUse(String firstName, String lastName, String username, String email, String role,
-			boolean isNoneLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException{
-		validateNewUsernameAndEmail(EMPTY, username, email);
-		User user = new User();
-		String password = generatePassword();
+    public User addNewUse(String firstName, String lastName, String username, String email, String role,
+                          boolean isNoneLocked, boolean isActive, MultipartFile profileImage)
+            throws UserNotFoundException, UsernameExistException, EmailExistException {
+
+        validateNewUsernameAndEmail(EMPTY, username, email);
+
+        User user = new User();
+        String password = generatePassword();
         user.setUserId(generateUserId());
         user.setFirstName(firstName);
         user.setLastName(lastName);
@@ -137,11 +141,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setNotLocked(isNoneLocked);
         user.setRole(getRoleEnumName(role).name());
         user.setAuthorities(getRoleEnumName(role).getAuthorities());
-        user.setProfileImageUrl(getTemporaryProfileImageUrl(username));
-        userRepository.save(user);
-        saveProfileImage(user,profileImage);
-		return user;
-	}
+
+        userRepository.save(user); 
+
+        saveProfileImage(user, profileImage); 
+        return user;
+    }
+
     
     @Override
 	public User UpdateUser(String currentUsername, String newFirstName, String newLastName, String newUsername,
@@ -207,23 +213,27 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private void saveProfileImage(User user, MultipartFile profileImage) {
         if (profileImage != null) {
             try {
-                Path userFolder = Paths.get(USER_FOLDER + user.getUsername()).toAbsolutePath().normalize();
+                Path userFolder = Paths.get(FileConstant.USER_FOLDER + user.getUsername()).toAbsolutePath().normalize();
                 if (!Files.exists(userFolder)) {
                     Files.createDirectories(userFolder);
-                    LOGGER.info(DIRECTORY_CREATED + userFolder);
+                    LOGGER.info(FileConstant.DIRECTORY_CREATED + userFolder);
                 }
-                Files.deleteIfExists(Paths.get(userFolder + "/" + user.getUsername() + DOT + JPG_EXTENSION));
-                Files.copy(profileImage.getInputStream(),
-                           userFolder.resolve(user.getUsername() + DOT + JPG_EXTENSION),
-                           StandardCopyOption.REPLACE_EXISTING);
-                user.setProfileImageUrl(setProfileImageUrl(user.getUsername()));
+
+                Path imagePath = userFolder.resolve(user.getUsername() + FileConstant.DOT + FileConstant.JPG_EXTENSION);
+                Files.deleteIfExists(imagePath);
+
+                Files.copy(profileImage.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
+
+                user.setProfileImageUrl(getTemporaryProfileImageUrl(user.getUsername()));
                 userRepository.save(user);
-                LOGGER.info(FILE_SAVED_IN_FILE_SYSTEM + profileImage.getOriginalFilename());
+
+                LOGGER.info(FileConstant.FILE_SAVED_IN_FILE_SYSTEM + profileImage.getOriginalFilename());
             } catch (IOException e) {
                 LOGGER.error("Error saving profile image: {}", e.getMessage());
             }
         }
     }
+
 
     
     private String setProfileImageUrl(String username) {
@@ -236,17 +246,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	}
     
     private String getTemporaryProfileImageUrl(String username) {
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path(DEFAULT_USER_IMAGE_PATH + username).toUriString();
-    } 
+        return ServletUriComponentsBuilder.fromCurrentContextPath()
+            .path(FileConstant.DEFAULT_USER_IMAGE_PATH + username + FileConstant.DOT + FileConstant.JPG_EXTENSION)
+            .toUriString();
+    }
+
+
+
+ 
     
     private String encodedPassword(String password) {
 		return passwordEncoder.encode(password);
 	}
 
-	private String getTemporaryProfileImageUrl() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
     private String generatePassword() {
         return RandomStringUtils.randomAlphanumeric(10);
