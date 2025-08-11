@@ -130,7 +130,7 @@ public class UserResource extends ExceptionHandling {
 	    }
 
 	      
-	    @GetMapping("/delete/{id}")
+	    @DeleteMapping("/delete/{id}")
 	    @PreAuthorize("hasAnyAuthority('user:delete')")
 	    public ResponseEntity<HttpResponse> deleteUser(@PathVariable("id") long id){
 	    	userService.deleteUser(id);
@@ -144,7 +144,7 @@ public class UserResource extends ExceptionHandling {
 	        return new ResponseEntity<>(user, OK);
 	    }
 	
-	    @GetMapping(path = "/image{username}/{fileName}", produces = {MediaType.IMAGE_JPEG_VALUE})
+	    @GetMapping(path = "/image/{username}/{fileName}", produces = {MediaType.IMAGE_JPEG_VALUE})
 	    public byte[] getProfileImage(@PathVariable("username") String username, @PathVariable("fileName")String fileName)throws IOException  {
 	    	return Files.readAllBytes(Paths.get(USER_FOLDER + username + FORWARD_SLASH + fileName));
 	    }
