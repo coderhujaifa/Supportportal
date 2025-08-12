@@ -130,13 +130,13 @@ public class UserResource extends ExceptionHandling {
 	    }
 
 	      
-	    @DeleteMapping("/delete/{id}")
-	    @PreAuthorize("hasAnyAuthority('user:delete')")
-	    public ResponseEntity<HttpResponse> deleteUser(@PathVariable("id") long id){
-	    	userService.deleteUser(id);
-	    	return response(NO_CONTENT, USER_DELETE_SUCCESSFULLY);
-	    }
-	    
+		    @DeleteMapping("/delete/{id}")
+		    @PreAuthorize("hasAnyAuthority('user:delete')")
+		    public ResponseEntity<HttpResponse> deleteUser(@PathVariable("id") long id){
+		    	userService.deleteUser(id);
+		    	return response(OK, USER_DELETE_SUCCESSFULLY);
+		    }
+		    
 	    @PostMapping("/updateProfileIamge")
 	    public ResponseEntity <User> updateProfileIamge(@RequestParam("username") String username,
 	        @RequestParam(value ="profileImage", required = false) MultipartFile profileImage)throws UserNotFoundException, UsernameExistException, EmailExistException, IOException {

@@ -152,23 +152,23 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 	@Override
 	public User UpdateUser(String currentUsername, String newFirstName, String newLastName, String newUsername,
-			String newEmail, String role, boolean isNoneLocked, boolean isActive, MultipartFile profileImage)
-			throws UserNotFoundException, UsernameExistException, EmailExistException {
-		User currentUser = validateNewUsernameAndEmail(currentUsername, newUsername, newEmail);
-		currentUser.setFirstName(newFirstName);
-		currentUser.setLastName(newLastName);
-		currentUser.setJoinDate(new Date());
-		currentUser.setUsername(newUsername);
-		currentUser.setEmail(newEmail);
-		currentUser.setActive(isActive);
-		currentUser.setNotLocked(isNoneLocked);
-		currentUser.setRole(getRoleEnumName(role).name());
-		currentUser.setAuthorities(getRoleEnumName(role).getAuthorities());
-		userRepository.save(currentUser);
-		saveProfileImage(currentUser, profileImage);
-		return currentUser;
+	                       String newEmail, String role, boolean isNoneLocked, boolean isActive,
+	                       MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException {
+	    User currentUser = validateNewUsernameAndEmail(currentUsername, newUsername, newEmail);
+	    currentUser.setFirstName(newFirstName);
+	    currentUser.setLastName(newLastName);
+	    currentUser.setJoinDate(new Date());
+	    currentUser.setUsername(newUsername);
+	    currentUser.setEmail(newEmail);
+	    currentUser.setActive(isActive);
+	    currentUser.setNotLocked(isNoneLocked);
+	    currentUser.setRole(getRoleEnumName(role).name());
+	    currentUser.setAuthorities(getRoleEnumName(role).getAuthorities());
+	    userRepository.save(currentUser);
+	    saveProfileImage(currentUser, profileImage);
+	    return currentUser;
 	}
-
+	
 	@Override
 	public void resetPassword(String email) throws MessagingException, EmailNotFoundException {
 		User user = userRepository.findUserByEmail(email);
@@ -185,12 +185,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 	@Override
 	public User updateProfileImage(String username, MultipartFile profileImage)
-			throws UserNotFoundException, UsernameExistException, EmailExistException {
-		User user = validateNewUsernameAndEmail(username, null, null);
-		saveProfileImage(user, profileImage);
-		return user;
+	        throws UserNotFoundException, UsernameExistException, EmailExistException {
+	    User user = validateNewUsernameAndEmail(username, null, null);
+	    saveProfileImage(user, profileImage);
+	    return user;
 	}
-
+	
 	@Override
 	public List<User> getUsers() {
 		return userRepository.findAll();
