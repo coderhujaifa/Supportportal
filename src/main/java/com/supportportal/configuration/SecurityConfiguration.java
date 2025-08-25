@@ -55,7 +55,7 @@ public class SecurityConfiguration {
                 "/user/list",                     
                 "/user/resetPassword/**",         
                 "/user/delete/**",                 
-                "/user/updateProfileIamge",        
+                "/user/updateProfileImage",        
                 "/user/image*/**"    
                 
             ).permitAll()

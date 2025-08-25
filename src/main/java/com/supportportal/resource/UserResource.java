@@ -35,12 +35,13 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
 import javax.mail.MessagingException;
 
-
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/user")
 public class UserResource extends ExceptionHandling {
@@ -65,6 +66,12 @@ public class UserResource extends ExceptionHandling {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<User> register(@RequestBody User user) throws UsernameExistException, UserNotFoundException, EmailExistException {
+        User newUser = userService.register(user.getFirstName(), user.getLastName(), user.getUsername(), user.getEmail());
+        return new ResponseEntity<>(newUser, OK);
+    }
+    
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody User user) {
         authenticate(user.getUsername(), user.getPassword());
@@ -72,12 +79,6 @@ public class UserResource extends ExceptionHandling {
         UserPrincipal userPrincipal = new UserPrincipal(loginUser);
         HttpHeaders jwtHeaders = getJwtHeader(userPrincipal);
         return new ResponseEntity<>(loginUser, jwtHeaders, OK);
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) throws UsernameExistException, UserNotFoundException, EmailExistException {
-        User newUser = userService.register(user.getFirstName(), user.getLastName(), user.getUsername(), user.getEmail());
-        return new ResponseEntity<>(newUser, OK);
     }
     
     @PostMapping("/add")
@@ -89,7 +90,8 @@ public class UserResource extends ExceptionHandling {
             @RequestParam("role") String role,
             @RequestParam("isActive") String isActive,
             @RequestParam("isNonLocked") String isNonLocked,
-            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage
+            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
+            @RequestParam(value = "currentUsername", required = false) String currentUsername 
     ) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException {
         User newUser = userService.addNewUse(firstName,lastName,userName,email,role,Boolean.parseBoolean(isNonLocked),Boolean.parseBoolean(isActive),profileImage);
         return new ResponseEntity<>(newUser, HttpStatus.OK);
@@ -130,24 +132,35 @@ public class UserResource extends ExceptionHandling {
 	    }
 
 	      
-		    @DeleteMapping("/delete/{id}")
+		    @DeleteMapping("/delete/{username}")
 		    @PreAuthorize("hasAnyAuthority('user:delete')")
-		    public ResponseEntity<HttpResponse> deleteUser(@PathVariable("id") long id){
-		    	userService.deleteUser(id);
+		    public ResponseEntity<HttpResponse> deleteUser(@PathVariable("username") String username) throws IOException{
+		    	userService.deleteUser(username);
 		    	return response(OK, USER_DELETE_SUCCESSFULLY);
 		    }
 		    
-	    @PostMapping("/updateProfileIamge")
-	    public ResponseEntity <User> updateProfileIamge(@RequestParam("username") String username,
+	    @PostMapping("/updateProfileImage")
+	    public ResponseEntity <User> updateProfileImage(@RequestParam("username") String username,
 	        @RequestParam(value ="profileImage", required = false) MultipartFile profileImage)throws UserNotFoundException, UsernameExistException, EmailExistException, IOException {
 	    	User user = userService.updateProfileImage(username, profileImage);
 	        return new ResponseEntity<>(user, OK);
 	    }
 	
 	    @GetMapping(path = "/image/{username}/{fileName}", produces = {MediaType.IMAGE_JPEG_VALUE})
-	    public byte[] getProfileImage(@PathVariable("username") String username, @PathVariable("fileName")String fileName)throws IOException  {
-	    	return Files.readAllBytes(Paths.get(USER_FOLDER + username + FORWARD_SLASH + fileName));
+	    public byte[] getProfileImage(
+	            @PathVariable("username") String username,
+	            @PathVariable("fileName") String fileName
+	    ) throws IOException {
+	        Path imagePath = Paths.get(USER_FOLDER + username + FORWARD_SLASH + fileName);
+
+	        if (Files.exists(imagePath)) {
+	            return Files.readAllBytes(imagePath);
+	        } else {
+	            Path defaultImagePath = Paths.get(USER_FOLDER + "default" + FORWARD_SLASH + "default.jpg");
+	            return Files.readAllBytes(defaultImagePath);
+	        }
 	    }
+
 	    
 	    @GetMapping(path = "/image/profile/{username}", produces = {MediaType.IMAGE_JPEG_VALUE})
 	    public byte[] getTempProfileImage(@PathVariable("username") String username) throws IOException {

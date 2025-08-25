@@ -21,7 +21,7 @@ public class SupportportalApplication {
 		SpringApplication.run(SupportportalApplication.class, args);
 		new File(USER_FOLDER).mkdirs();
 	}
-	
+
 	@Bean
 	public CorsFilter corsFilter() {
 		UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();

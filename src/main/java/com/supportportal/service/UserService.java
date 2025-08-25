@@ -6,6 +6,7 @@ import com.supportportal.exception.domain.EmailNotFoundException;
 import com.supportportal.exception.domain.UserNotFoundException;
 import com.supportportal.exception.domain.UsernameExistException;
 
+import java.io.IOException;
 import java.util.List;
 import javax.mail.MessagingException;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,8 +21,8 @@ public interface UserService {
 
 	User findUserByEmail(String email);
 
-	void deleteUser(long id);
-	
+	void deleteUser(String username) throws IOException;
+
 	User addNewUse(String firstName, String lastName, String username, String email, String role, boolean isNonLocked,
 			boolean isActive, MultipartFile profileImage)
 			throws UserNotFoundException, UsernameExistException, EmailExistException;
