@@ -25,14 +25,11 @@ public class User implements Serializable {
     private String email;
     private String profileImageUrl;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private Date lastLoginDate;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private Date lastLoginDateDisplay;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "saki/Kolkata")
     private Date joinDate;
+
 
     private String role;
     private String[] authorities;
