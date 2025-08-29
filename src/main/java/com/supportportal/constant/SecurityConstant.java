@@ -16,4 +16,5 @@ public class SecurityConstant {
 	public static final String AUTHORIZATION = "Authorization";
 	//public static final String[] PUBLIC_URL = {"/user/login", "/user/register", "/user/resetpassword/**", "/user/image/**"};
 	public static final String[] PUBLIC_URL = {"/user/login","/user/register","/user/image/**"};
+//	public static final String[] PUBLIC_URL = {"**"};
 }
